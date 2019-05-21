@@ -3,7 +3,8 @@
 cc="\033[1;33m"     # yellow
 nn="\033[0m"
 
-MAX_MAKE_JOBS=${MAX_MAKE_JOBS-`nproc --all`}
+# MAX_MAKE_JOBS=${MAX_MAKE_JOBS-`nproc --all`}
+MAX_MAKE_JOBS=1
 
 echo -e "System has $cc`nproc --all`$nn cores; will use $cc$MAX_MAKE_JOBS$nn jobs"
 echo Requesting root access...
@@ -48,8 +49,8 @@ echo Determining newest DPDK version...
 # Add DPDK version by hand
 DPDK_VSN="19.05"
 
-DPDK_FILEVSN="$DPDK_VSN"
-[ "${vsn[0]}" != "-1" ] && DPDK_FILEVSN="$DPDK_VSN.${vsn[0]}"
+# DPDK_FILEVSN="$DPDK_VSN"
+# [ "${vsn[0]}" != "-1" ] && DPDK_FILEVSN="$DPDK_VSN.${vsn[0]}"
 
 echo -e "Using DPDK version $cc${DPDK_VSN}$nn"
 
@@ -61,7 +62,11 @@ sudo apt-get update && sudo apt-get -y install g++ git automake libtool libgc-de
 WAITPROC_APTGET="$!"
 [ $PARALLEL_INSTALL -ne 0 ] || wait "$WAITPROC_APTGET"
 
-[ ! -d "dpdk-${DPDK_VSN}" ] && wget http://fast.dpdk.org/rel/dpdk-$DPDK_FILEVSN.tar.xz && tar xJf dpdk-$DPDK_FILEVSN.tar.xz && rm dpdk-$DPDK_FILEVSN.tar.xz &
+# [ ! -d "dpdk-${DPDK_VSN}" ] && wget http://fast.dpdk.org/rel/dpdk-$DPDK_FILEVSN.tar.xz && tar xJf dpdk-$DPDK_FILEVSN.tar.xz && rm dpdk-$DPDK_FILEVSN.tar.xz &
+# WAITPROC_DPDK="$!"
+# [ $PARALLEL_INSTALL -ne 0 ] || wait "$WAITPROC_DPDK"
+
+[ ! -d "dpdk-${DPDK_VSN}" ] && wget http://fast.dpdk.org/rel/dpdk-$DPDK_VSN.tar.xz && tar xJf dpdk-$DPDK_VSN.tar.xz &
 WAITPROC_DPDK="$!"
 [ $PARALLEL_INSTALL -ne 0 ] || wait "$WAITPROC_DPDK"
 
@@ -85,7 +90,7 @@ WAITPROC_T4P4S="$!"
 # Setup DPDK
 [ $PARALLEL_INSTALL -ne 1 ] || wait "$WAITPROC_DPDK"
 
-export RTE_SDK=`pwd`/`ls -d dpdk*$DPDK_FILEVSN*/`
+export RTE_SDK=`pwd`/`ls -d dpdk*$DPDK_VSN*/`
 
 cd "$RTE_SDK"
 make install DESTDIR="${RTE_TARGET}" T="${RTE_TARGET}" -j4
@@ -123,7 +128,7 @@ cd ../..
 
 cat <<EOF >./t4p4s_environment_variables.sh
 export DPDK_VSN=${DPDK_VSN}
-export RTE_SDK=`pwd`/`ls -d dpdk*$DPDK_FILEVSN*/`
+export RTE_SDK=`pwd`/`ls -d dpdk*$DPDK_VSN*/`
 export RTE_TARGET=${RTE_TARGET}
 export P4C=`pwd`/p4c
 EOF
