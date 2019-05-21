@@ -6,9 +6,9 @@ nn="\033[0m"
 MAX_MAKE_JOBS=${MAX_MAKE_JOBS-`nproc --all`}
 
 echo -e "System has $cc`nproc --all`$nn cores; will use $cc$MAX_MAKE_JOBS$nn jobs"
-echo Requesting root access...
-sudo echo -n ""
-echo Root access granted, starting...
+# echo Requesting root access...
+# sudo echo -n ""
+# echo Root access granted, starting...
 
 # Set sensible defaults
 export PARALLEL_INSTALL=${PARALLEL_INSTALL-1}
@@ -57,7 +57,8 @@ echo -e "Using DPDK version $cc${DPDK_VSN}$nn"
 echo
 
 # Download libraries
-sudo apt-get update && sudo apt-get -y install g++ git automake libtool libgc-dev bison flex libfl-dev libgmp-dev libboost-dev libboost-iostreams-dev pkg-config python python-scapy python-ipaddr tcpdump cmake python-setuptools libprotobuf-dev libnuma-dev curl &
+# sudo apt-get update && sudo apt-get -y install g++ git automake libtool libgc-dev bison flex libfl-dev libgmp-dev libboost-dev libboost-iostreams-dev pkg-config python python-scapy python-ipaddr tcpdump cmake python-setuptools libprotobuf-dev libnuma-dev curl &
+apt-get update && apt-get -y install g++ git automake libtool libgc-dev bison flex libfl-dev libgmp-dev libboost-dev libboost-iostreams-dev pkg-config python python-scapy python-ipaddr tcpdump cmake python-setuptools libprotobuf-dev libnuma-dev curl &
 WAITPROC_APTGET="$!"
 [ $PARALLEL_INSTALL -ne 0 ] || wait "$WAITPROC_APTGET"
 
@@ -99,8 +100,10 @@ cd protobuf
 ./autogen.sh
 ./configure
 make -j ${MAX_MAKE_JOBS}
-sudo make install -j ${MAX_MAKE_JOBS}
-sudo ldconfig
+# sudo make install -j ${MAX_MAKE_JOBS}
+make install -j ${MAX_MAKE_JOBS}
+# sudo ldconfig
+ldconfig
 cd ..
 
 
@@ -114,7 +117,8 @@ cd p4c
 cd build
 cmake ..
 make -j ${MAX_MAKE_JOBS}
-sudo make install -j ${MAX_MAKE_JOBS}
+# sudo make install -j ${MAX_MAKE_JOBS}
+make install -j ${MAX_MAKE_JOBS}
 cd ../..
 
 
