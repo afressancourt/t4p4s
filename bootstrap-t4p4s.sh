@@ -29,20 +29,25 @@ fi
 echo Determining newest DPDK version...
 
 # Get the most recent DPDK version
-vsn=`curl -s "https://fast.dpdk.org/rel/" --list-only \
-    | grep ".tar.xz" \
-    | sed -e "s/^[^>]*>dpdk-\([0-9.]*\)\.tar\.xz[^0-9]*\([0-9]\{2\}\)-\([a-zA-Z]\{3\}\)-\([0-9]\{4\}\) \([0-9]\{2\}\):\([0-9]\{2\}\).*$/\4 \3 \2 \5 \6 \1/g" \
-    | sed -e "s/ \([0-9]\{2\}\)[.]\([0-9]\{2\}\)$/ \1.\2.-1/g" \
-    | tr '.' ' ' \
-    | sort -k6,6n -k7,7n -k8,8n -k1,1 -k2,2M -k3,3 -k4,4 -k5,5 \
-    | tac \
-    | cut -d" " -f 6- \
-    | sed -e "s/^\([0-9\-]*\) \([0-9\-]*\) \([0-9\-]*\)$/\3 \1.\2/g" \
-    | uniq -f1 \
-    | head -1`
+# TODO rework script to make it work
+# vsn=`curl -s "https://fast.dpdk.org/rel/" --list-only \
+#     | grep ".tar.xz" \
+#     | sed -e "s/^[^>]*>dpdk-\([0-9.]*\)\.tar\.xz[^0-9]*\([0-9]\{2\}\)-\([a-zA-Z]\{3\}\)-\([0-9]\{4\}\) \([0-9]\{2\}\):\([0-9]\{2\}\).*$/\4 \3 \2 \5 \6 \1/g" \
+#     | sed -e "s/ \([0-9]\{2\}\)[.]\([0-9]\{2\}\)$/ \1.\2.-1/g" \
+#     | tr '.' ' ' \
+#     | sort -k6,6n -k7,7n -k8,8n -k1,1 -k2,2M -k3,3 -k4,4 -k5,5 \
+#     | tac \
+#     | cut -d" " -f 6- \
+#     | sed -e "s/^\([0-9\-]*\) \([0-9\-]*\) \([0-9\-]*\)$/\3 \1.\2/g" \
+#     | uniq -f1 \
+#     | head -1`
 
-vsn=($vsn)
-DPDK_VSN="${DPDK_VSN-vsn[1]}"
+# vsn=($vsn)
+# DPDK_VSN="${DPDK_VSN-vsn[1]}"
+
+# Add DPDK version by hand
+DPDK_VSN="19.05"
+
 DPDK_FILEVSN="$DPDK_VSN"
 [ "${vsn[0]}" != "-1" ] && DPDK_FILEVSN="$DPDK_VSN.${vsn[0]}"
 
@@ -76,9 +81,6 @@ WAITPROC_T4P4S="$!"
 
 # Wait for apt-get to finish
 [ $PARALLEL_INSTALL -ne 1 ] || wait "$WAITPROC_APTGET"
-
-
-
 
 # Setup DPDK
 [ $PARALLEL_INSTALL -ne 1 ] || wait "$WAITPROC_DPDK"
